@@ -1,3 +1,5 @@
+import ReviewSection from "@/components/property/ReviewSection";
+
 interface PropertyDetailProps {
   property: {
     id: number;
@@ -36,6 +38,8 @@ export default function PropertyDetail({ property }: PropertyDetailProps) {
           </p>
         </div>
       </div>
+      <ReviewSection propertyId={property.id} />
     </div>
+    
   );
 }
