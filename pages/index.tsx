@@ -1,22 +1,56 @@
-
-import { PROPERTYLISTINGSAMPLE } from "@/constants";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import Image from "next/image";
-import React from "react";
 import HeroSection from "../public/assets/img/HeroSection.png";
+import PropertyCard from "@/components/property/PropertyCard";
+
+export interface Property {
+  id: number;
+  title: string;
+  location: string;
+  price: number;
+  rating?: number;
+  image?: string;
+}
 
 export default function Home() {
   const filters = ["Top Villa", "Self Checkin", "Free WiFi", "Luxury", "Pet Friendly"];
+
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        // ✅ Fetch from local mock API
+        const response = await axios.get<Property[]>("/api/properties");
+        setProperties(response.data);
+      } catch (err) {
+        console.error("Error fetching properties:", err);
+        setError("Failed to load properties");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, []);
+
+  if (loading) return <p className="text-center mt-10 text-lg">Loading...</p>;
+  if (error) return <p className="text-center text-red-500 mt-10">{error}</p>;
 
   return (
     <div>
       {/* Hero Section */}
       <section
-        className="h-[400px] bg-cover bg-center flex flex-col items-center justify-center text-white" 
+        className="h-[400px] bg-cover bg-center flex flex-col items-center justify-center text-white"
         style={{ backgroundImage: `url(${HeroSection.src})` }}
       >
-          
-        <h1 className="text-4xl font-bold mb-2">Find your favorite place here!</h1>
-        <p className="text-lg">The best prices for over 2 million properties worldwide.</p>
+        <h1 className="text-4xl font-bold mb-2 text-center">Find your favorite place here!</h1>
+        <p className="text-lg text-center">
+          The best prices for over 2 million properties worldwide.
+        </p>
       </section>
 
       {/* Filters */}
@@ -33,20 +67,8 @@ export default function Home() {
 
       {/* Property Listings */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-        {PROPERTYLISTINGSAMPLE.map((property, index) => (
-          <div key={index} className="border rounded-lg overflow-hidden shadow hover:shadow-lg transition">
-            <Image src={property.thumbimageProps.image} alt={property.name} className="h-48 w-full object-cover" width={property.thumbimageProps.width} height={property.thumbimageProps.height}  />
-            <div className="p-4">
-              <h2 className="text-xl font-semibold">{property.name}</h2>
-              <p className="text-gray-500 text-sm">
-                {property.address.city}, {property.address.country}
-              </p>
-              <div className="flex justify-between items-center mt-2">
-                <span className="text-indigo-600 font-bold">${property.price}/night</span>
-                <span className="text-yellow-500">⭐ {property.rating}</span>
-              </div>
-            </div>
-          </div>
+        {properties.map((property) => (
+          <PropertyCard key={property.id} property={property} />
         ))}
       </section>
     </div>
