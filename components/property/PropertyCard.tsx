@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface PropertyCardProps {
   property: {
     id: number;
@@ -11,6 +13,7 @@ interface PropertyCardProps {
 
 export default function PropertyCard({ property }: PropertyCardProps) {
   return (
+    <Link href={`/property/${property.id}`}>
     <div className="border rounded-lg overflow-hidden shadow hover:shadow-lg transition bg-white">
       <img
         src={property.image || "/images/default.jpg"}
@@ -28,5 +31,6 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         </div>
       </div>
     </div>
+    </Link>
   );
 }
